@@ -1,0 +1,344 @@
+<html>
+    <head>
+        
+        <title>Asteria</title>
+        <link rel ="shortcut icon" href = "http://vl.rv.ua/templates/vl/images/favicon.ico"/>
+        
+        <link rel = "stylesheet" type = "text/css" href = "css/homestyle.css">
+        <link rel = "stylesheet" type = "text/css" href = "css/toolbar.css">
+        
+        <script src = "js/jquery-3.2.1.js"></script>
+        <script src = "js/jquery-ui.js"></script>
+        <script src = "https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        
+        <script> 
+            var root = 'https://jsonplaceholder.typicode.com';
+            const num = 10; 
+            var users = []; 
+            var posts = [];
+            var photos = []; 
+            var albums = []; 
+            var lastPost; 
+            
+            function getAlbums() { 
+                
+                return $.ajax({
+                    url : root +'/albums', 
+                    method : 'GET', 
+                    type : 'JSON',
+                    success : function(data) { 
+                       albums = data;
+                    }
+                });
+            }
+            
+            function getPhotos() { 
+                
+                return $.ajax({
+                    url : root +'/photos', 
+                    method : 'GET', 
+                    type : 'JSON',
+                    success : function(data) { 
+                        photos = data;
+                    }
+                });
+            
+            }
+            function getUsers() { 
+                
+                return $.ajax({
+                    url : root +'/users', 
+                    method : 'GET',
+                    type : 'JSON', 
+                    success : function(data) { 
+                        users = data; 
+                    }
+                });
+            
+            }
+            
+            function getPosts() { 
+            
+                return $.ajax({
+                    url : root +'/posts', 
+                    method : 'GET',
+                    type : 'JSON',
+                    success : function(data) { 
+                        posts = data; 
+                    }
+                });
+            }
+            
+            function loadPosts(index) { 
+                var i = 1; 
+                var start = index; 
+                
+                while(i <= num && start > -1) {
+                    
+                    createPost(start);
+                    if( start == 0) {
+                        start = - 1;
+                        $('#next').hide();
+                        break;
+                    }
+                    start--; 
+                    i++;    
+                }
+                
+                lastPost = start ;
+            }
+            
+            function createPost(index) {
+                
+                var userId = posts[index].userId - 1;
+                
+                var arf = document.createElement("a");
+                var ls1 = document.createElement("li"); 
+                var ls2 = document.createElement("li"); 
+                var inf = document.createElement("div"); 
+                var tit = document.createElement("div"); 
+                var bod = document.createElement("div"); 
+                var pos = document.createElement("div");
+                var pic = document.createElement("img"); 
+                var hed = document.createElement("div"); 
+                
+                $(arf).addClass("name");
+                $(ls1).addClass("list1"); 
+                $(ls2).addClass("list2");
+                $(inf).addClass("info");
+                $(tit).addClass("title");
+                $(bod).addClass("body");
+                $(pos).addClass("posts");
+                $(pic).addClass("icon");
+                $(hed).addClass("postheader");
+                
+                $(pic).attr('src', "../WEBAPDE-MP1/img/dp.png");
+                $(ls1).text(posts[index].title);
+                $(ls2).text(posts[index].body); 
+                $(arf).text(users[userId].username); 
+                $(arf).attr('href', 'profile.html?' +(userId+1) )
+                
+                $(inf).append(arf); 
+                $(hed).append(pic); 
+                $(hed).append(inf);
+                
+                $(tit).append(ls1); 
+                $(bod).append(ls2); 
+                
+                $(pos).append(hed);
+                $(pos).append(tit);
+                $(pos).append(bod);
+                
+                $('#postcontainer').append(pos);                 
+            }
+            
+            function searchPost(value) {
+                        var i;
+                        var found = false; 
+
+                        for(i = 0; i < posts.length && !found; i++) { 
+                            if(posts[i].title == value) { 
+                                found = true; 
+                            }
+                        }
+
+                        if(found == true ) { 
+                            if(confirm("Do u want to Proceed?")) {
+                                window.location.href = "profile.html?" + posts[i-1].userId;
+                            } 
+                        }
+                        return found;
+                }
+                
+                function searchPhotos(value) {
+                        var i;
+                        var found = false; 
+
+                        for(i = 0; i < photos.length && !found; i++) { 
+                            if(photos[i].title == value) { 
+                                found = true; 
+                                }
+                            }
+
+                        if(found == true ) {                          if(confirm("Do u want to Proceed?")) {
+                               window.location.href = "album.html?" + photos[i-1].albumId;
+                            } 
+                        }
+                        return found;
+                }
+                
+                function searchAlbums(value) {
+                        var i;
+                        var found = false; 
+                        
+                        for(i = 0; i < albums.length && !found; i++) { 
+                            if(albums[i].title == value) { 
+                                found = true; 
+                            }
+                        }
+                
+                        if(found == true ) { 
+                            if(confirm("Do u want to Proceed?")) {
+                                    console.log(albums[i].id);
+                                    window.location.href = "album.html?" + albums[i-1].id;
+                                } 
+                        }
+                       return found;
+                }
+
+            function searchUsers(value) {
+                        var i;
+                        var found = false; 
+
+                        for(i = 0; i < users.length && !found; i++) { 
+                            if(users[i].name == value || users[i].username == value) { 
+                                found = true; 
+                            }
+                        }
+
+                        if(found == true ) { 
+                            if(confirm("Do u want to Proceed?")) {
+                                window.location.href = "profile.html?" + users[i-1].id;
+                            } 
+                        }
+                    return found;
+                
+            }
+            
+            function start() {        
+
+                loadPosts(posts.length-1); 
+                $( ".button" ).click(function() {
+
+                    if (!$('#header').hasClass("off")) {
+                        $('.button').animate({ 'left': '+201px' 
+                        });
+
+                        $('#slidemenu').animate({'left': '0px'});
+
+                        $('#header').addClass("off");
+                    }
+
+                    else {
+                        $('.button').animate({'left': '-5px'});
+                        $('#slidemenu').animate({'left': '-205px'});
+                        $('#header').removeClass("off");
+                    };
+                });
+                    
+                $('#next').click(function() {
+                    loadPosts(lastPost);
+                });
+                
+                $('#searchBox').keydown(function (e){
+                    if(e.keyCode == 13){
+                                var value = document.getElementById('searchBox').value;
+                                var i;
+                                var post, photo, user, album; 
+
+                                post = searchPost(value); 
+                                photo = searchPhotos(value);
+                                album = searchAlbums(value);
+                                user = searchUsers(value);
+
+                                if(!post && !photo && !user && !album)
+                                    alert(value + " is not Found!");
+                                return false;
+                    }
+                });
+                    
+            }
+            
+            $(document).ready(function () {
+                
+                    $.when(getPosts(), getUsers(), getAlbums(), getPhotos()).done(function(){
+                        start(); 
+                    });
+            });  
+            
+        </script>
+        
+    </head>
+    
+    <body>
+        
+        <div id = "headerCon">
+            <div id = "header">
+                <img src = "img/cloud.gif" width = "80">
+                <img src = "img/moony.gif" width = "100">
+                <img src = "img/cloud2.png" width = "80">
+                <img src = "img/cloud3.png" width = "80">
+                <img src = "img/cloud.gif" width = "80">
+            </div>
+            <div id = "title">
+                <img src = "img/title.png"  id = "titlepic" height = "50">
+            </div>
+        </div>
+        
+        <div class = "maincontainer"> 
+            
+            <div id = "postcontainer"> </div>
+            
+            <div id = "next">
+
+                <a><img src = "img/down.png"></a>
+
+            </div>
+
+            <div class = "button" style = "left: -5px">
+                <div id = "bstyle">
+
+                    <img src = "img/design2.gif">
+
+                </div>
+            </div>
+
+            <div id = "slidemenu" style = "left: -205px"> 
+              <div class = "con">
+                 <a href = "home.html">
+                      <div class = "anothercon">
+                        <img src = "img/home2.png" id = "homeicon">
+                        <span id = "hometext" class = "text">home</span>
+                        </div>
+                 </a> 
+                  <a href = "gallery.html">
+                      <div class = "anothercon">
+                        <img src = "img/gallery.png" id = "galicon">
+                          <span id = "galtext" class = "text" >gallery</span>
+                      </div>
+                  </a>  
+                  <a href = "users.html">
+                      <div class = "anothercon">
+                        <img src = "img/prof.png" id = "profcon">
+                          <span id = "proftext" class = "text" >profiles</span>
+                     </div>
+                  </a> 
+                    <a href = "galAlbum.html">
+                        <div class = "anothercon">
+                            <img src = "img/album.png" id = "alcon">
+                            <span id = "altext" class = "text" >albums</span>
+                        </div>
+                      </a> 
+                </div>
+               
+            </div>
+            
+        </div>
+        
+        <div id = "top">
+        
+            <form>
+                <input type = "search" id = "searchBox" placeholder = "Search..."/>
+            </form>
+            
+        </div>
+        
+        <div id = "footer">
+        
+        </div>
+        
+    </body>
+
+
+
+</html>
